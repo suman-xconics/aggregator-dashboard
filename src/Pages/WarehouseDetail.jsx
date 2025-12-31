@@ -95,7 +95,7 @@ export default function WarehouseDetail() {
         <WarehouseHeader />
         <div className="warehouse-detail-container">
           <div className="card">
-            <h2>Loading...</h2>
+            <h2 className="text">Loading...</h2>
             <div style={{ textAlign: "center", padding: "2rem" }}>
               <div className="spinner"></div>
               <p style={{ marginTop: "1rem", color: "#666" }}>Fetching warehouse data...</p>
@@ -112,7 +112,7 @@ export default function WarehouseDetail() {
         <WarehouseHeader />
         <div className="warehouse-detail-container">
           <div className="card">
-            <h2>Error</h2>
+            <h2 className="text">Error</h2>
             <p style={{ padding: "2rem", textAlign: "center", color: "#721c24" }}>
               {error || "Warehouse not found"}
             </p>
@@ -135,7 +135,7 @@ export default function WarehouseDetail() {
         {/* HEADER STRIP */}
         <div className="header">
           <div>
-            <h2>{warehouse.warehouseCode}</h2>
+            <h2 className="text">{warehouse.warehouseCode}</h2>
             <p style={{ margin: "0.5rem 0 0 0", color: "#666", fontSize: "0.9rem" }}>
               {warehouse.warehouseName}
             </p>
