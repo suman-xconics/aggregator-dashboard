@@ -82,8 +82,8 @@ export default function App() {
         <Header toggleSidebar={toggleSidebar} />
 
         <Routes>
-          
-        {/* CREATE USER */}
+
+          {/* CREATE USER */}
           <Route path="/create-user" element={<CreateUser />} />
           {/* AGGREGATOR */}
           <Route path="/aggregators" element={<AggregatorMaster />} />
@@ -129,6 +129,9 @@ export default function App() {
           {/* DASHBOARD */}
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
+        <footer className="app-footer">
+          <span>Powered by <strong>XCONICS</strong></span>
+        </footer>
       </div>
 
       {/* Mobile overlay */}
