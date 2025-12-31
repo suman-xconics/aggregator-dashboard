@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Eye, X, Edit } from "lucide-react";
+import { Eye, X, Edit, ChevronDown, ChevronRight } from "lucide-react";
 import { 
   getInstallationRequisitions,
   updateInstallationRequisition,
@@ -84,6 +84,7 @@ export default function Dashboard() {
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [expandedRows, setExpandedRows] = useState(new Set());
 
   useEffect(() => {
     fetchRequisitions();
@@ -169,6 +170,22 @@ export default function Dashboard() {
     handleCloseEditModal();
   };
 
+  const toggleRow = (reqId) => {
+    setExpandedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(reqId)) {
+        newSet.delete(reqId);
+      } else {
+        newSet.add(reqId);
+      }
+      return newSet;
+    });
+  };
+
+  const hasEngineers = (req) => {
+    return req.installationRequisitionRequests && req.installationRequisitionRequests.length > 0;
+  };
+
   return (
     <div className="dashboard-page">
       {/* HEADER */}
@@ -240,6 +257,7 @@ export default function Dashboard() {
         <table>
           <thead>
             <tr>
+              <th style={{ width: "50px", textAlign: "center" }}></th>
               <th>Requisition No</th>
               <th>Branch Code</th>
               <th>Branch Name</th>
@@ -260,7 +278,7 @@ export default function Dashboard() {
             {loading ? (
               [...Array(5)].map((_, index) => (
                 <tr key={index}>
-                  {[...Array(14)].map((_, colIndex) => (
+                  {[...Array(15)].map((_, colIndex) => (
                     <td key={colIndex}>
                       <div className="skeleton-line" />
                     </td>
@@ -269,86 +287,219 @@ export default function Dashboard() {
               ))
             ) : filteredRequisitions.length === 0 ? (
               <tr>
-                <td colSpan="14" style={{ textAlign: "center", padding: "2rem" }}>
+                <td colSpan="15" style={{ textAlign: "center", padding: "2rem" }}>
                   No tickets found
                 </td>
               </tr>
             ) : (
               filteredRequisitions.map((req) => (
-                <tr key={req.id}>
-                  <td>
-                    <strong>{req.requisitionNo}</strong>
-                  </td>
-                  <td>{req.branch?.branchCode || "N/A"}</td>
-                  <td>{req.branch?.branchName || "N/A"}</td>
-                  <td>{req.branchId || "N/A"}</td>
-                  <td>{req.vehicleNo}</td>
-                  <td>{req.customerName}</td>
-                  <td>{req.state || "N/A"}</td>
-                  <td>{req.pincode || "N/A"}</td>
-                  <td>
-                    <span
-                      style={{
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        ...getPriorityBadge(req.priority),
-                      }}
-                    >
-                      {req.priority}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: "0.9rem" }}>{formatDate(req.requestedAt)}</td>
-                  <td style={{ fontSize: "0.9rem" }}>{formatDate(req.preferredInstallationDate)}</td>
-                  <td>
-                    <span
-                      className={`status-pill ${req.status.toLowerCase()}`}
-                      style={{
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        ...getStatusBadgeStyle(req.status),
-                      }}
-                    >
-                      {req.status}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      style={{
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        backgroundColor: req.completedAt != null ? "#e8f5e9" : "#ffebee",
-                        color: req.completedAt != null ? "#2e7d32" : "#c62828",
-                      }}
-                    >
-                      {req.completedAt != null ? "Yes" : "No"}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        className="icon-btn"
-                        onClick={() => handleViewDetails(req)}
-                        title="View Details"
+                <>
+                  <tr key={req.id}>
+                    <td style={{ textAlign: "center" }}>
+                      {hasEngineers(req) ? (
+                        <button
+                          onClick={() => toggleRow(req.id)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: "0.5rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#1976d2",
+                            transition: "transform 0.2s",
+                          }}
+                          title={expandedRows.has(req.id) ? "Collapse" : "Expand"}
+                        >
+                          {expandedRows.has(req.id) ? (
+                            <ChevronDown size={20} />
+                          ) : (
+                            <ChevronRight size={20} />
+                          )}
+                        </button>
+                      ) : null}
+                    </td>
+                    <td>
+                      <strong>{req.requisitionNo}</strong>
+                    </td>
+                    <td>{req.branch?.branchCode || "N/A"}</td>
+                    <td>{req.branch?.branchName || "N/A"}</td>
+                    <td>{req.branchId || "N/A"}</td>
+                    <td>{req.vehicleNo}</td>
+                    <td>{req.customerName}</td>
+                    <td>{req.state || "N/A"}</td>
+                    <td>{req.pincode || "N/A"}</td>
+                    <td>
+                      <span
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          ...getPriorityBadge(req.priority),
+                        }}
                       >
-                        <Eye size={16} />
-                      </button>
-                      
-                      {!["ASSIGNED", "ACCEPTED", "COMPLETED", "CANCELLED"].includes(req.status) && (
+                        {req.priority}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: "0.9rem" }}>{formatDate(req.requestedAt)}</td>
+                    <td style={{ fontSize: "0.9rem" }}>{formatDate(req.preferredInstallationDate)}</td>
+                    <td>
+                      <span
+                        className={`status-pill ${req.status.toLowerCase()}`}
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          ...getStatusBadgeStyle(req.status),
+                        }}
+                      >
+                        {req.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          backgroundColor: req.completedAt != null ? "#e8f5e9" : "#ffebee",
+                          color: req.completedAt != null ? "#2e7d32" : "#c62828",
+                        }}
+                      >
+                        {req.completedAt != null ? "Yes" : "No"}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
                         <button
                           className="icon-btn"
-                          onClick={() => handleEditRequisition(req)}
-                          title="Assign Requisition"
-                          style={{ color: "#f57c00" }}
+                          onClick={() => handleViewDetails(req)}
+                          title="View Details"
                         >
-                          <Edit size={16} />
+                          <Eye size={16} />
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                        
+                        {!["ASSIGNED", "ACCEPTED", "COMPLETED", "CANCELLED"].includes(req.status) && (
+                          <button
+                            className="icon-btn"
+                            onClick={() => handleEditRequisition(req)}
+                            title="Assign Requisition"
+                            style={{ color: "#f57c00" }}
+                          >
+                            <Edit size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  {/* EXPANDED ROW - ENGINEER DETAILS */}
+                  {expandedRows.has(req.id) && hasEngineers(req) && (
+                    <tr key={`${req.id}-expanded`} style={{ backgroundColor: "#ffffff" }}>
+                      <td colSpan="15" style={{ padding: "0", borderTop: "none" }}>
+                        <div style={{ 
+                          padding: "1.25rem 3rem", 
+                          backgroundColor: "#f8f9fa",
+                          borderLeft: "4px solid #1976d2"
+                        }}>
+                          <div style={{ 
+                            marginBottom: "1rem", 
+                            display: "flex", 
+                            alignItems: "center",
+                            gap: "0.5rem"
+                          }}>
+                            <h4 style={{ 
+                              margin: 0, 
+                              fontSize: "0.95rem", 
+                              color: "#1976d2",
+                              fontWeight: "600"
+                            }}>
+                              Assigned Engineers
+                            </h4>
+                            <span style={{
+                              backgroundColor: "#1976d2",
+                              color: "white",
+                              padding: "0.15rem 0.5rem",
+                              borderRadius: "12px",
+                              fontSize: "0.8rem",
+                              fontWeight: "500"
+                            }}>
+                              {req.installationRequisitionRequests.length}
+                            </span>
+                          </div>
+                          
+                          <div style={{ 
+                            backgroundColor: "white", 
+                            borderRadius: "6px",
+                            overflow: "hidden",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+                          }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                              <thead>
+                                <tr style={{ backgroundColor: "#1976d2" }}>
+                                  <th style={{ 
+                                    padding: "0.875rem 1rem", 
+                                    textAlign: "left", 
+                                    fontSize: "0.85rem",
+                                    color: "white",
+                                    fontWeight: "600",
+                                    letterSpacing: "0.3px"
+                                  }}>
+                                    Engineer Code
+                                  </th>
+                                  <th style={{ 
+                                    padding: "0.875rem 1rem", 
+                                    textAlign: "left", 
+                                    fontSize: "0.85rem",
+                                    color: "white",
+                                    fontWeight: "600",
+                                    letterSpacing: "0.3px"
+                                  }}>
+                                    Engineer Name
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {req.installationRequisitionRequests.map((request, index) => (
+                                  <tr 
+                                    key={index} 
+                                    style={{ 
+                                      borderBottom: index < req.installationRequisitionRequests.length - 1 ? "1px solid #e0e0e0" : "none",
+                                      transition: "background-color 0.2s"
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f5f5f5"}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+                                  >
+                                    <td style={{ padding: "0.875rem 1rem", fontSize: "0.9rem" }}>
+                                      <span style={{ 
+                                        fontFamily: "monospace", 
+                                        color: "#1976d2",
+                                        fontWeight: "500",
+                                        backgroundColor: "#e3f2fd",
+                                        padding: "0.25rem 0.5rem",
+                                        borderRadius: "4px"
+                                      }}>
+                                        {request.assignedEngineer?.engineerCode || "N/A"}
+                                      </span>
+                                    </td>
+                                    <td style={{ 
+                                      padding: "0.875rem 1rem", 
+                                      fontSize: "0.9rem",
+                                      color: "#333"
+                                    }}>
+                                      {request.assignedEngineer?.engineerName || "N/A"}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))
             )}
           </tbody>
@@ -755,6 +906,83 @@ function RequisitionModal({ requisition, onClose }) {
               </div>
             </div>
           </div>
+
+          {/* ASSIGNED ENGINEERS SECTION */}
+          {requisition.installationRequisitionRequests && requisition.installationRequisitionRequests.length > 0 && (
+            <div className="modal-section">
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center",
+                gap: "0.5rem",
+                marginBottom: "1rem"
+              }}>
+                <h4 style={{ margin: 0 }}>Assigned Engineers</h4>
+                <span style={{
+                  backgroundColor: "#1976d2",
+                  color: "white",
+                  padding: "0.15rem 0.5rem",
+                  borderRadius: "12px",
+                  fontSize: "0.8rem",
+                  fontWeight: "500"
+                }}>
+                  {requisition.installationRequisitionRequests.length}
+                </span>
+              </div>
+              
+              <div style={{ 
+                backgroundColor: "white", 
+                borderRadius: "6px",
+                overflow: "hidden",
+                border: "1px solid #e0e0e0"
+              }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ backgroundColor: "#1976d2" }}>
+                      <th style={{ 
+                        padding: "0.875rem 1rem", 
+                        textAlign: "left",
+                        color: "white",
+                        fontWeight: "600",
+                        fontSize: "0.85rem"
+                      }}>
+                        Engineer Code
+                      </th>
+                      <th style={{ 
+                        padding: "0.875rem 1rem", 
+                        textAlign: "left",
+                        color: "white",
+                        fontWeight: "600",
+                        fontSize: "0.85rem"
+                      }}>
+                        Engineer Name
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requisition.installationRequisitionRequests.map((request, index) => (
+                      <tr key={index} style={{ borderBottom: index < requisition.installationRequisitionRequests.length - 1 ? "1px solid #e0e0e0" : "none" }}>
+                        <td style={{ padding: "0.875rem 1rem" }}>
+                          <span style={{ 
+                            fontFamily: "monospace", 
+                            color: "#1976d2",
+                            fontWeight: "500",
+                            backgroundColor: "#e3f2fd",
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "4px"
+                          }}>
+                            {request.assignedEngineer?.engineerCode || "N/A"}
+                          </span>
+                        </td>
+                        <td style={{ padding: "0.875rem 1rem" }}>
+                          {request.assignedEngineer?.engineerName || "N/A"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="modal-footer">
