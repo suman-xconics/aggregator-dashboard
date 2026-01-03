@@ -52,6 +52,28 @@ const formatDateForInput = (isoDateString) => {
   }
 };
 
+// ✅ SIMPLIFIED: ALWAYS requestedAt + 48 hours (ignores preferredInstallationDate & status)
+const getPreferredDateAlways48Hours = (requestedAt) => {
+  if (!requestedAt) return "N/A";
+  try {
+    const requestedDate = new Date(requestedAt);
+    if (isNaN(requestedDate.getTime())) return "N/A";
+    
+    // Add exactly 48 hours
+    const preferredDate = new Date(requestedDate.getTime() + (48 * 60 * 60 * 1000));
+    
+    return preferredDate.toLocaleString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    return "N/A";
+  }
+};
+
 const getStatusBadgeStyle = (status) => {
   const styles = {
     NEW: { backgroundColor: "#e3f2fd", color: "#1976d2" },
@@ -343,7 +365,12 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td style={{ fontSize: "0.9rem" }}>{formatDate(req.requestedAt)}</td>
-                    <td style={{ fontSize: "0.9rem" }}>{formatDate(req.preferredInstallationDate)}</td>
+                    
+                    {/* ✅ FIXED: ALWAYS requestedAt + 48hrs (NO badge, NO conditions) */}
+                    <td style={{ fontSize: "0.9rem" }}>
+                      {getPreferredDateAlways48Hours(req.requestedAt)}
+                    </td>
+                    
                     <td>
                       <span
                         className={`status-pill ${req.status.toLowerCase()}`}
@@ -486,7 +513,7 @@ export default function Dashboard() {
                                     <td style={{ 
                                       padding: "0.875rem 1rem", 
                                       fontSize: "0.9rem",
-                                      color: "#333"
+                                      color: "#000000"
                                     }}>
                                       {request.assignedEngineer?.engineerName || "N/A"}
                                     </td>
@@ -896,10 +923,13 @@ function RequisitionModal({ requisition, onClose }) {
                 <label>Requested At</label>
                 <p>{formatDateTime(requisition.requestedAt)}</p>
               </div>
+
+              {/* ✅ FIXED: Preferred Date ALWAYS requestedAt + 48hrs (no badge, no preferredInstallationDate usage) */}
               <div>
                 <label>Preferred Date</label>
-                <p>{formatDate(requisition.preferredInstallationDate)}</p>
+                <p>{getPreferredDateAlways48Hours(requisition.requestedAt)}</p>
               </div>
+
               <div>
                 <label>Completed At</label>
                 <p>{requisition.completedAt ? formatDateTime(requisition.completedAt) : "Not Completed"}</p>
@@ -910,70 +940,83 @@ function RequisitionModal({ requisition, onClose }) {
           {/* ASSIGNED ENGINEERS SECTION */}
           {requisition.installationRequisitionRequests && requisition.installationRequisitionRequests.length > 0 && (
             <div className="modal-section">
-              <div style={{ 
-                display: "flex", 
-                alignItems: "center",
-                gap: "0.5rem",
-                marginBottom: "1rem"
-              }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
                 <h4 style={{ margin: 0 }}>Assigned Engineers</h4>
-                <span style={{
-                  backgroundColor: "#1976d2",
-                  color: "white",
-                  padding: "0.15rem 0.5rem",
-                  borderRadius: "12px",
-                  fontSize: "0.8rem",
-                  fontWeight: "500"
-                }}>
+                <span
+                  style={{
+                    backgroundColor: "#1976d2",
+                    color: "white",
+                    padding: "0.15rem 0.5rem",
+                    borderRadius: "12px",
+                    fontSize: "0.8rem",
+                    fontWeight: "500",
+                  }}
+                >
                   {requisition.installationRequisitionRequests.length}
                 </span>
               </div>
-              
-              <div style={{ 
-                backgroundColor: "white", 
-                borderRadius: "6px",
-                overflow: "hidden",
-                border: "1px solid #e0e0e0"
-              }}>
+
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "6px",
+                  overflow: "hidden",
+                  border: "1px solid #e0e0e0",
+                }}
+              >
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr style={{ backgroundColor: "#1976d2" }}>
-                      <th style={{ 
-                        padding: "0.875rem 1rem", 
-                        textAlign: "left",
-                        color: "white",
-                        fontWeight: "600",
-                        fontSize: "0.85rem"
-                      }}>
+                      <th
+                        style={{
+                          padding: "0.875rem 1rem",
+                          textAlign: "left",
+                          color: "white",
+                          fontWeight: "600",
+                          fontSize: "0.85rem",
+                        }}
+                      >
                         Engineer Code
                       </th>
-                      <th style={{ 
-                        padding: "0.875rem 1rem", 
-                        textAlign: "left",
-                        color: "white",
-                        fontWeight: "600",
-                        fontSize: "0.85rem"
-                      }}>
+                      <th
+                        style={{
+                          padding: "0.875rem 1rem",
+                          textAlign: "left",
+                          color: "white",
+                          fontWeight: "600",
+                          fontSize: "0.85rem",
+                        }}
+                      >
                         Engineer Name
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {requisition.installationRequisitionRequests.map((request, index) => (
-                      <tr key={index} style={{ borderBottom: index < requisition.installationRequisitionRequests.length - 1 ? "1px solid #e0e0e0" : "none" }}>
+                      <tr
+                        key={index}
+                        style={{
+                          borderBottom:
+                            index < requisition.installationRequisitionRequests.length - 1
+                              ? "1px solid #e0e0e0"
+                              : "none",
+                        }}
+                      >
                         <td style={{ padding: "0.875rem 1rem" }}>
-                          <span style={{ 
-                            fontFamily: "monospace", 
-                            color: "#1976d2",
-                            fontWeight: "500",
-                            backgroundColor: "#e3f2fd",
-                            padding: "0.25rem 0.5rem",
-                            borderRadius: "4px"
-                          }}>
+                          <span
+                            style={{
+                              fontFamily: "monospace",
+                              color: "#1976d2",
+                              fontWeight: "500",
+                              backgroundColor: "#e3f2fd",
+                              padding: "0.25rem 0.5rem",
+                              borderRadius: "4px",
+                            }}
+                          >
                             {request.assignedEngineer?.engineerCode || "N/A"}
                           </span>
                         </td>
-                        <td style={{ padding: "0.875rem 1rem" }}>
+                        <td style={{ padding: "0.875rem 1rem", color: "#000000" }}>
                           {request.assignedEngineer?.engineerName || "N/A"}
                         </td>
                       </tr>
