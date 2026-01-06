@@ -197,7 +197,7 @@ body[data-theme="dark"] .profile-avatar {
 }
 /* Expanded sidebar text */
 .brand-text {
-  font-size: 2rem;            /* large text */
+  font-size: 1.3rem;            /* large text */
   font-weight: 700;
   color: #2563eb;               /* blue (Tailwind blue-600) */
   text-align: center;

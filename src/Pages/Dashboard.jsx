@@ -364,7 +364,7 @@ export default function Dashboard() {
                         {req.priority}
                       </span>
                     </td>
-                    <td style={{ fontSize: "0.9rem" }}>{formatDate(req.requestedAt)}</td>
+                   <td style={{ fontSize: "0.9rem" }}>{formatDateTime(req.requestedAt)}</td>
                     
                     {/* ✅ FIXED: ALWAYS requestedAt + 48hrs (NO badge, NO conditions) */}
                     <td style={{ fontSize: "0.9rem" }}>

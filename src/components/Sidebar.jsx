@@ -3,10 +3,10 @@ import {
   Home,
   Users,
   LogOut,
-  Layers,        // Aggregator
-  Building2,     // Lender Branch
-  Wrench,        // Field Engineer
-  Warehouse      // Warehouse
+  Layers, // Aggregator
+  Building2, // Lender Branch
+  Wrench, // Field Engineer
+  Warehouse, // Warehouse
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -31,9 +31,20 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
     >
       {/* ===== BRAND ===== */}
       <div className="brand">
-  {isOpen && <span className="brand-text">Aggregator</span>}
-  {!isOpen && <span className="brand-text-collapsed">Aggregator</span>}
-</div>
+        <img
+          src="/fav.svg"
+          alt="Xconics Logo"
+          style={{ height: "40px" }}
+        />
+        {isOpen && (
+          <span className="brand-text">
+            Field Operation
+          </span>
+        )}
+        {!isOpen && (
+          <span className="brand-text-collapsed">Field Operation</span>
+        )}
+      </div>
 
       {/* ===== NAV ===== */}
       <nav className="nav">
@@ -41,9 +52,7 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
         <NavLink
           to="/"
           end
-          className={({ isActive }) =>
-            `nav-item ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
           onClick={handleNavClick}
         >
           <span className="nav-icon">
@@ -51,8 +60,6 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
           </span>
           {isOpen && <span className="nav-label">Dashboard</span>}
         </NavLink>
-
-        
 
         {/* Aggregator 
         <NavLink
@@ -71,9 +78,7 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
         {/* Field Engineer */}
         <NavLink
           to="/engineers"
-          className={({ isActive }) =>
-            `nav-item ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
           onClick={handleNavClick}
         >
           <span className="nav-icon">
@@ -85,9 +90,7 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
         {/* Warehouse */}
         <NavLink
           to="/warehouse"
-          className={({ isActive }) =>
-            `nav-item ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
           onClick={handleNavClick}
         >
           <span className="nav-icon">
@@ -96,13 +99,11 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
           {isOpen && <span className="nav-label">Warehouse</span>}
         </NavLink>
         {/* Warehouse */}
-        
+
         {/* Device */}
         <NavLink
           to="/devices"
-          className={({ isActive }) =>
-            `nav-item ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
           onClick={handleNavClick}
         >
           <span className="nav-icon">
@@ -110,11 +111,9 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
           </span>
           {isOpen && <span className="nav-label">Devices</span>}
         </NavLink>
-<NavLink
+        <NavLink
           to="/device-movement"
-          className={({ isActive }) =>
-            `nav-item ${isActive ? "active" : ""}`
-          }
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
           onClick={handleNavClick}
         >
           <span className="nav-icon">
@@ -122,16 +121,12 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
           </span>
           {isOpen && <span className="nav-label">Device Movement</span>}
         </NavLink>
-
-        
       </nav>
 
       {/* ===== FOOTER ===== */}
       <div className="sidebar-footer">
         <div className="user-info">
-          <div className="profile-avatar">
-            {user.name.charAt(0)}
-          </div>
+          <div className="profile-avatar">{user.name.charAt(0)}</div>
 
           {isOpen && (
             <div className="user-text">
