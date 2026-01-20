@@ -5,6 +5,7 @@ import CreateUser from "./pages/CreateUser";
 
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+import SupportTickets from "./pages/SupportTickets";
 
 
 
@@ -128,6 +129,10 @@ export default function App() {
 
           {/* DASHBOARD */}
           <Route path="/dashboard" element={<Dashboard />} />
+
+                    {/* Support Tickets */}
+          <Route path="/support-tickets" element={<SupportTickets />} />
+
         </Routes>
         <footer className="app-footer">
           <span>Powered by <strong>XCONICS</strong></span>

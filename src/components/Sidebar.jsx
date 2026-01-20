@@ -6,7 +6,8 @@ import {
   Layers, // Aggregator
   Building2, // Lender Branch
   Wrench, // Field Engineer
-  Warehouse, // Warehouse
+  Warehouse,
+  Tags, // Warehouse
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -120,6 +121,20 @@ export default function Sidebar({ isOpen, isMobile, closeSidebar }) {
             <Building2 size={20} strokeWidth={1.8} />
           </span>
           {isOpen && <span className="nav-label">Device Movement</span>}
+        </NavLink>
+                <NavLink
+          to="/support-tickets"
+          className={({ isActive }) =>
+            `nav-item ${isActive ? "active" : ""}`
+          }
+          onClick={handleNavClick}
+        >
+          <span className="nav-icon">
+            <Tags size={20} strokeWidth={1.8} />
+          </span>
+          {isOpen && <span className="nav-label">
+            Support Tickets
+            </span>}
         </NavLink>
       </nav>
 
